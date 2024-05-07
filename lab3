@@ -1,0 +1,179 @@
+%%
+%5.1.1
+clear;
+close all;
+load("Filters2.mat");
+
+stem(f0);
+stem(f1);
+%f0: N=93, Symmetrical, Type 2
+%f1: N=93, antisymmetric, Type 4
+%%
+%5.1.2
+clear;
+close all;
+load("Filters2.mat");
+freqz(f0);
+%freqz(f1);
+%f0: Lowpass
+%f1: Highpass
+%%
+%5.1.3
+
+clear;
+close all;
+load("Filters2.mat");
+% Filter 2, Lowpass
+wcT = 0.45*pi;
+wsT = 0.55*pi;
+
+wT_1 = linspace(0,wcT,1000);  % wT axis wcT
+wT_2 = linspace(wsT,pi,1000); % wT axis wsT
+
+H_Wc = freqz(f0,1, wT_1);     % Frequency response wcT
+H_Ws = freqz(f0,1, wT_2);     % Frequency response wsT
+
+Mag_Wc = H_2_MAG(H_Wc);       % Magnitude response wcT
+Mag_Ws = H_2_MAG(H_Ws);       % Magnitude response wsT
+
+dc = max(Mag_Wc);             % dc = 0.0027
+ds = max(Mag_Ws);             % ds = -64.2538
+
+zplane(h0);                   % one zero at z=-1 => lowpass
+
+%%
+%5.1.3
+clear;
+close all;
+load("Filters2.mat");
+% Filter 2, Highpass
+wcT = 0.55*pi;
+wsT = 0.45*pi;
+
+wT_1 = linspace(0,wsT,1000);  % wT axis wsT
+wT_2 = linspace(wcT,pi,1000); % wT axis wcT
+
+H_Wc = freqz(f1,1, wT_2);     % Frequency response wcT
+H_Ws = freqz(f1,1, wT_1);     % Frequency response wsT
+
+Mag_Wc = H_2_MAG(H_Wc);       % Magnitude response wcT
+Mag_Ws = H_2_MAG(H_Ws);       % Magnitude response wsT
+
+dc = max(Mag_Wc);             % dc = 0.0027
+ds = max(Mag_Ws);             % ds = -64.2541
+
+zplane(h1);                   % one zero at z=1 => highpass
+%%
+%5.2.1
+clear;
+close all;
+load("Filters2.mat");
+
+wT = linspace(0,pi,1000);
+
+H0 = conv(f0,h0);
+H1 = conv(f1,h1);
+H2 = conv(f0,h1);
+
+figure;
+freqz(H0, 1 , wT);
+title('Cascade f0 and h0');
+
+figure;
+freqz(H1, 1 , wT);
+title('Cascade f1 and h1');
+
+figure;
+freqz(H2, 1 , wT);
+title('Cascade f0 and h1');
+
+
+
+%%
+%5.2.2
+clear;
+close all;
+load("Filters2.mat");
+%h0=upsample(h0,2);
+%f0=upsample(f0,2);
+H = conv(f0,h0);
+h=POLYMULT(h0,f0,1);
+g0 = H(1:2:end);   
+y=downsample(H,2);
+%stem(H0);
+stem(h);
+%%
+clear;
+close all;
+load("Filters2.mat");
+H0 = conv(f0,h0);
+stem(H0);
+
+
+%%
+%5.3.2
+clear;
+close all;
+load("Inputs.mat");
+
+s0 = upsample(s0, 2);
+s1 = upsample(s1, 2);
+x0  = conv(s0,m0);
+x1  = conv(s1,m1);
+
+y0  = downsample(x0,2);
+y1  = downsample(x1,2);
+
+figure;
+freqz(y0);
+figure;
+freqz(y1);
+%%
+%5.3.3
+clear;
+close all;
+load("Inputs.mat");
+
+delay=length(s0)/2;
+s0_delay=s0(delay+1:end);
+s1=s1(delay+1:end);
+
+s0_upsample = upsample(s0_delay, 2);
+s1 = upsample(s1, 2);
+x0  = conv(s0_upsample,m0);
+x1  = conv(s1,m1);
+
+y0  = downsample(x0,2);
+y1  = downsample(x1,2);
+
+figure;
+freqz(y0);
+figure;
+freqz(y1);
+
+SNR=10*log10(sum(abs(s0).^2)/sum(abs(y0-s0).^2));
+%%
+%5.3.5
+clear;
+close all;
+load("Filters1.mat");
+load("Inputs.mat");
+
+delay=length(s0)/2;
+
+s0=s0(delay+1:end);
+s1=s1(delay+1:end);
+
+s0 = upsample(s0, 2);
+s1 = upsample(s1, 2);
+
+x0 = conv(s0, f0);
+x1 = conv(s1, f1);
+
+v0= conv(x0, h0);
+v1= conv(x1, h1);
+
+s0 = downsample(v0, 2);
+s1 = downsample(v1, 2);
+
+freqz(s0);
