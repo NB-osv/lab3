@@ -94,22 +94,49 @@ title('Cascade f0 and h1');
 clear;
 close all;
 load("Filters2.mat");
-%h0=upsample(h0,2);
-%f0=upsample(f0,2);
-H = conv(f0,h0);
-h=POLYMULT(h0,f0,1);
-g0 = H(1:2:end);   
-y=downsample(H,2);
-%stem(H0);
-stem(h);
+H02 = conv(f0,h0);
+H0 = conv(f0,h0)*2;
+H1 = conv(f1,h1)*2;
+H2 = conv(f0,h1)*2;
+
+h0 = H0(2:2:end); % Zeroth polyphase component g(n*2)
+h1 = H1(2:2:end); % Zeroth polyphase component g(n*2)
+h2 = H2(2:2:end); % Zeroth polyphase component g(n*2)
+
+[sum(H02) sum(h0)]
+
+figure;
+stem(h0);
+figure;
+stem(h1);
+figure;
+stem(h2);
 %%
+%5.2.3
 clear;
 close all;
 load("Filters2.mat");
-H0 = conv(f0,h0);
-stem(H0);
 
+wT = linspace(0,pi,1000);
 
+H0 = conv(f0,h0)*2;
+H1 = conv(f1,h1)*2;
+
+h0 = H0(2:2:end);          % Zeroth polyphase component g(n*2)
+h1 = H1(2:2:end);          % Zeroth polyphase component g(n*2)
+
+H0_Wc = freqz(h0,1, wT);   % Frequency response 
+Mag_0  = H_2_MAG(H0_Wc);   % Magnitude response 
+H1_Wc = freqz(h1,1, wT);   % Frequency response 
+Mag_1  = H_2_MAG(H1_Wc);   % Magnitude response 
+
+dc0 = max(Mag_0);          % dc = 0.0053
+dc1 = max(Mag_1);          % dc = 0.0053
+%%
+%5.2.3
+clear;
+close all;
+load("Filters2.mat");
 %%
 %5.3.2
 clear;
@@ -177,3 +204,8 @@ s0 = downsample(v0, 2);
 s1 = downsample(v1, 2);
 
 freqz(s0);
+%% 
+
+
+
+
